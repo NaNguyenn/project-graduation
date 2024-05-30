@@ -1,5 +1,14 @@
 {
-  "Index": {
-    "title": "Hello world!"
+  "home": {
+    "inputEmail": {
+      "label": "Please insert HUST email"
+    },
+    "next": "Next"
+  },
+  "validationMessage": {
+    "required": "This field is required",
+    "email": {
+      "invalid": "Invalid email format"
+    }
   }
 }

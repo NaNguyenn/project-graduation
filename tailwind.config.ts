@@ -11,8 +11,8 @@ const config: Config = {
     extend: {
       colors: {
         primary: {
-          default: "da251d",
-          dark: "96120F",
+          default: "#da251d",
+          dark: "#96120F",
         },
       },
       spacing: {
@@ -109,6 +109,7 @@ const config: Config = {
         16: "16px",
         12: "12px",
         8: "8px",
+        4: "4px",
       },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",

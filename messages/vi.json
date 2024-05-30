@@ -1,5 +1,14 @@
 {
-  "Index": {
-    "title": "Xin chào!"
+  "home": {
+    "inputEmail": {
+      "label": "Vui lòng nhập email Đại học Bách Khoa"
+    },
+    "next": "Tiếp tục"
+  },
+  "validationMessage": {
+    "required": "Đây là trường bắt buộc",
+    "email": {
+      "invalid": "Email không đúng định dạng"
+    }
   }
 }
