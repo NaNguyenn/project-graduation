@@ -1,14 +1,27 @@
 {
-  "home": {
-    "inputEmail": {
-      "label": "Please insert HUST email"
-    },
-    "next": "Next"
-  },
   "validationMessage": {
     "required": "This field is required",
     "email": {
       "invalid": "Invalid email format"
+    }
+  },
+  "common": {
+    "next": "Next"
+  },
+  "home": {
+    "inputEmail": {
+      "label": "Please insert HUST email"
+    }
+  },
+  "register": {
+    "inputUsername": {
+      "label": "Username"
+    },
+    "inputAccount": {
+      "label": "Account"
+    },
+    "inputDatabaseName": {
+      "label": "Database Name"
     }
   }
 }

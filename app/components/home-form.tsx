@@ -34,6 +34,10 @@ export const HomeForm = memo(() => {
     mode: "onChange",
   });
 
+  const loading = useMemo(() => {
+    return false;
+  }, []);
+
   const onSubmit = useCallback(async (data: FormData) => {
     console.log(data);
   }, []);
@@ -59,9 +63,9 @@ export const HomeForm = memo(() => {
       <AppButton
         className="self-end rounded-4 px-16px py-4px bg-primary-dark text-white"
         type="submit"
-        disabled={!isValid}
+        disabled={loading}
       >
-        {t("home.next")}
+        {t("common.next")}
       </AppButton>
     </form>
   );

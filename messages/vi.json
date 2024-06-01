@@ -1,14 +1,27 @@
 {
-  "home": {
-    "inputEmail": {
-      "label": "Vui lòng nhập email Đại học Bách Khoa"
-    },
-    "next": "Tiếp tục"
-  },
   "validationMessage": {
     "required": "Đây là trường bắt buộc",
     "email": {
       "invalid": "Email không đúng định dạng"
+    }
+  },
+  "common": {
+    "next": "Tiếp tục"
+  },
+  "home": {
+    "inputEmail": {
+      "label": "Vui lòng nhập email Đại học Bách Khoa"
+    }
+  },
+  "register": {
+    "inputUsername": {
+      "label": "Tên đăng nhập"
+    },
+    "inputAccount": {
+      "label": "Tài khoản"
+    },
+    "inputDatabaseName": {
+      "label": "Tên Cơ sở dữ liệu"
     }
   }
 }
