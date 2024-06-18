@@ -3,6 +3,9 @@
     "required": "Đây là trường bắt buộc",
     "email": {
       "invalid": "Email không đúng định dạng"
+    },
+    "form": {
+      "invalid": "Đầu vào không đúng định dạng"
     }
   },
   "common": {
