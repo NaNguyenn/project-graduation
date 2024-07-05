@@ -1,19 +1,33 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { ChangeEvent, memo, useTransition } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { ChangeEvent, memo, useCallback, useTransition } from "react";
 import { useLocale } from "use-intl";
 
 export const SelectLocalization = memo(() => {
   const [isPending, startTransition] = useTransition();
-  const router = useRouter();
   const currentLocale = useLocale();
-  const handleLocalizationChange = (e: ChangeEvent<HTMLSelectElement>) => {
-    const selectedLocale = e.target.value;
-    startTransition(() => {
-      router.replace("/" + selectedLocale);
-    });
-  };
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const handleLocalizationChange = useCallback(
+    (e: ChangeEvent<HTMLSelectElement>) => {
+      const selectedLocale = e.target.value;
+      const pathParts = pathname.split("/");
+      const currentLocale = pathParts[1];
+
+      const newPathname = pathname.replace(
+        `/${currentLocale}`,
+        `/${selectedLocale}`
+      );
+
+      startTransition(() => {
+        router.replace(`${newPathname}?${searchParams.toString()}`);
+      });
+    },
+    [pathname, router, searchParams]
+  );
 
   return (
     <select
