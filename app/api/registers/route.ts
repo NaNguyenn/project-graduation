@@ -2,7 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import db from "../db";
-import Register from "../models/Register";
+import Register, { RegisterType } from "../models/Register";
 import { randomBytes } from "crypto";
 
 const schema = z.object({
@@ -23,14 +23,14 @@ export async function POST(req: NextRequest) {
       { status: 400 }
     );
   try {
-    const token = randomBytes(32).toString("hex");
+    // const token = randomBytes(32).toString("hex");
     const expiryDate = new Date(Date.now() + 60 * 60 * 1000);
-    Register.create({
+    const res: RegisterType = await Register.create({
       email: body.email,
       expiryDate: expiryDate.toISOString(),
-      token,
+      // token,
     });
-    return NextResponse.json(body, { status: 201 });
+    return NextResponse.json(res, { status: 201 });
   } catch (err: any) {
     return NextResponse.json({ ...body, error: err.message }, { status: 400 });
   }

@@ -1,12 +1,11 @@
 import mongoose from "mongoose";
 
-export interface Registers extends mongoose.Document {
+export interface RegisterType extends mongoose.Document {
   email: string;
   expiryDate: string;
-  token: string;
 }
 
-const RegisterSchema = new mongoose.Schema<Registers>({
+const RegisterSchema = new mongoose.Schema<RegisterType>({
   email: {
     type: String,
     required: true,
@@ -18,12 +17,7 @@ const RegisterSchema = new mongoose.Schema<Registers>({
     required: true,
     trim: true,
   },
-  token: {
-    type: String,
-    required: true,
-    trim: true,
-  },
 });
 
 export default mongoose.models.Register ||
-  mongoose.model<Registers>("Register", RegisterSchema);
+  mongoose.model<RegisterType>("Register", RegisterSchema);
