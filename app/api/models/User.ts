@@ -16,19 +16,20 @@ const UserSchema = new mongoose.Schema<UserType>({
   },
   username: {
     type: String,
-    required: true,
+    required: false,
     unique: true,
     trim: true,
   },
   account: {
     type: String,
-    required: true,
+    required: false,
     unique: true,
     trim: true,
   },
   databaseName: {
     type: String,
-    required: true,
+    required: false,
+    unique: true,
     trim: true,
   },
 });
