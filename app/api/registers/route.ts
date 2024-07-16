@@ -22,13 +22,24 @@ export async function POST(req: NextRequest) {
       { ...body, error: t("validationMessage.form.invalid") },
       { status: 400 }
     );
+
   try {
-    // const token = randomBytes(32).toString("hex");
+    const existingRegister = await Register.findOne({ email: body.email });
+    if (existingRegister) {
+      if (new Date() <= new Date(existingRegister.expiryDate)) {
+        return NextResponse.json(
+          { ...body, error: t("validationMessage.form.invalid") },
+          { status: 400 }
+        );
+      }
+      if (new Date() > new Date(existingRegister.expiryDate))
+        await Register.deleteOne({ email: body.email });
+    }
+
     const expiryDate = new Date(Date.now() + 60 * 60 * 1000);
     const res: RegisterType = await Register.create({
       email: body.email,
       expiryDate: expiryDate.toISOString(),
-      // token,
     });
     return NextResponse.json(res, { status: 201 });
   } catch (err: any) {
