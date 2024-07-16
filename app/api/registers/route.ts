@@ -3,7 +3,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import db from "../db";
 import Register, { RegisterType } from "../models/Register";
-import { randomBytes } from "crypto";
 
 const schema = z.object({
   email: z.string().min(1).email(),
@@ -25,15 +24,18 @@ export async function POST(req: NextRequest) {
 
   try {
     const existingRegister = await Register.findOne({ email: body.email });
+    const currentDate = new Date();
     if (existingRegister) {
-      if (new Date() <= new Date(existingRegister.expiryDate)) {
+      if (currentDate <= new Date(existingRegister.expiryDate)) {
         return NextResponse.json(
           { ...body, error: t("validationMessage.form.invalid") },
           { status: 400 }
         );
       }
-      if (new Date() > new Date(existingRegister.expiryDate))
-        await Register.deleteOne({ email: body.email });
+      const newExpiryDate = new Date(Date.now() + 60 * 60 * 1000);
+      existingRegister.expiryDate = newExpiryDate.toISOString();
+      await existingRegister.save();
+      return NextResponse.json(existingRegister, { status: 200 });
     }
 
     const expiryDate = new Date(Date.now() + 60 * 60 * 1000);

@@ -8,12 +8,16 @@
       "invalid": "Đầu vào không đúng định dạng"
     }
   },
+  "error": {
+    "system": "Lỗi hệ thống. Vui lòng thử lại sau",
+    "unavailableUser": "Người dùng không tồn tại"
+  },
   "common": {
     "next": "Tiếp tục"
   },
   "home": {
     "inputEmail": {
-      "label": "Vui lòng nhập email Đại học Bách Khoa"
+      "label": "Vui lòng nhập email"
     }
   },
   "register": {

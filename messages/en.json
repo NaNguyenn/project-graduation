@@ -8,12 +8,16 @@
       "invalid": "Invalid form data"
     }
   },
+  "error": {
+    "system": "System error. Please try again later",
+    "unavailableUser": "User not existed"
+  },
   "common": {
     "next": "Next"
   },
   "home": {
     "inputEmail": {
-      "label": "Please insert HUST email"
+      "label": "Please insert email"
     }
   },
   "register": {
