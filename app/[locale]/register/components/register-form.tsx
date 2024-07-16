@@ -1,28 +1,51 @@
 "use client";
 import { AppInput, AppButton } from "@/app/components/ui";
+import { regexNoSpecialCharsOrSpaces } from "@/app/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
 import { memo, useCallback, useMemo } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 
-type FormData = { username: string; account: string; databaseName: string };
+type Props = {
+  email: string;
+};
 
-export const RegisterForm = memo(() => {
+type FormData = {
+  email: string;
+  username?: string;
+  account?: string;
+  databaseName?: string;
+};
+
+export const RegisterForm = memo(({ email }: Props) => {
   const t = useTranslations();
 
   const validationSchema: z.ZodType<FormData> = useMemo(
     () =>
       z.object({
+        email: z.string().min(1).email(),
         username: z
           .string()
-          .min(1, { message: t("validationMessage.required") }),
+          .regex(
+            regexNoSpecialCharsOrSpaces,
+            t("validationMessage.form.invalid")
+          )
+          .optional(),
         account: z
           .string()
-          .min(1, { message: t("validationMessage.required") }),
+          .regex(
+            regexNoSpecialCharsOrSpaces,
+            t("validationMessage.form.invalid")
+          )
+          .optional(),
         databaseName: z
           .string()
-          .min(1, { message: t("validationMessage.required") }),
+          .regex(
+            regexNoSpecialCharsOrSpaces,
+            t("validationMessage.form.invalid")
+          )
+          .optional(),
       }),
     [t]
   );
@@ -34,6 +57,7 @@ export const RegisterForm = memo(() => {
   } = useForm<FormData>({
     resolver: zodResolver(validationSchema),
     defaultValues: {
+      email: email,
       username: "",
       account: "",
       databaseName: "",

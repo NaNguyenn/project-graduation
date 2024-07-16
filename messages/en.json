@@ -26,5 +26,6 @@
     "inputDatabaseName": {
       "label": "Database Name"
     }
-  }
+  },
+  "pleaseCheckEmail": "Please check your email"
 }

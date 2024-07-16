@@ -14,7 +14,7 @@ export default function RegisterPage({
     <main className="min-h-screen flex-col flex-center bg-black">
       <SelectLocalization />
       <div className="p-32px bg-white rounded-8 flex-col">
-        <RegisterForm />
+        <RegisterForm email={email} />
       </div>
     </main>
   );

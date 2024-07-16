@@ -26,5 +26,6 @@
     "inputDatabaseName": {
       "label": "Tên Cơ sở dữ liệu"
     }
-  }
+  },
+  "pleaseCheckEmail": "Vui lòng kiểm tra email"
 }
