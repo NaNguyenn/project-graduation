@@ -8,6 +8,8 @@ type Props = {
 export default function RegisterPage({
   searchParams: { email, expiryDate, token },
 }: Props) {
+  console.log("🚀 ~ token:", token);
+  console.log("🚀 ~ expiryDate:", expiryDate);
   console.log("🚀 ~ email:", email);
 
   return (

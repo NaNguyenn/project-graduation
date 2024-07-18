@@ -1,5 +1,5 @@
 import { getTranslations } from "next-intl/server";
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { z } from "zod";
 import db from "../db";
 import { regexNoSpecialCharsOrSpaces } from "@/app/utils";
@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
   const body = await req.json();
   const validation = registerUserSchema.safeParse(body);
   if (!validation.success)
-    return NextResponse.json(
+    return Response.json(
       { ...body, error: t("validationMessage.form.invalid") },
       { status: 400 }
     );
@@ -39,10 +39,10 @@ export async function POST(req: NextRequest) {
         existingRegister.databaseName = body.databaseName;
       }
       await existingRegister.save();
-      return NextResponse.json(existingRegister, { status: 200 });
+      return Response.json(existingRegister, { status: 200 });
     }
   } catch (err: any) {
-    return NextResponse.json({ ...body, error: err.message }, { status: 400 });
+    return Response.json({ ...body, error: err.message }, { status: 400 });
   }
 }
 
@@ -61,7 +61,7 @@ export async function GET(req: NextRequest) {
   const body = await req.json();
   const validation = checkTokenSchema.safeParse(body);
   if (!validation.success)
-    return NextResponse.json(
+    return Response.json(
       { ...body, error: t("validationMessage.form.invalid") },
       { status: 400 }
     );

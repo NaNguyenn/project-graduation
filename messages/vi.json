@@ -10,7 +10,8 @@
   },
   "error": {
     "system": "Lỗi hệ thống. Vui lòng thử lại sau",
-    "unavailableUser": "Người dùng không tồn tại"
+    "senderInvalid": "Lỗi thiết lập người gửi",
+    "userUnavailable": "Người dùng không tồn tại"
   },
   "common": {
     "next": "Tiếp tục"
@@ -31,5 +32,9 @@
       "label": "Tên Cơ sở dữ liệu"
     }
   },
-  "pleaseCheckEmail": "Vui lòng kiểm tra email"
+  "pleaseCheckInbox": "Vui lòng kiểm tra hòm thư",
+  "email": {
+    "subject": "Link đăng ký sử dụng dịch vụ",
+    "body": "Ấn link này để tiếp tục quá trình đăng ký"
+  }
 }

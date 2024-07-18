@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 
 export interface RegisterType extends mongoose.Document {
   email: string;
+  token: string;
   expiryDate: string;
   username: string;
   account: string;
@@ -13,6 +14,12 @@ const RegisterSchema = new mongoose.Schema<RegisterType>({
     type: String,
     required: true,
     unique: true,
+    trim: true,
+  },
+  token: {
+    type: String,
+    required: true,
+    unique: false,
     trim: true,
   },
   expiryDate: {

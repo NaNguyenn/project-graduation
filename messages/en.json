@@ -10,7 +10,8 @@
   },
   "error": {
     "system": "System error. Please try again later",
-    "unavailableUser": "User not existed"
+    "senderInvalid": "Sender configuration error",
+    "userUnavailable": "User not existed"
   },
   "common": {
     "next": "Next"
@@ -31,5 +32,9 @@
       "label": "Database Name"
     }
   },
-  "pleaseCheckEmail": "Please check your email"
+  "pleaseCheckInbox": "Please check your inbox",
+  "email": {
+    "subject": "Service registration link",
+    "body": "Follow this link to continue your registration process"
+  }
 }
