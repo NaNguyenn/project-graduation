@@ -11,7 +11,8 @@
   "error": {
     "system": "System error. Please try again later",
     "senderInvalid": "Sender configuration error",
-    "userUnavailable": "User not existed"
+    "userUnavailable": "User not existed",
+    "tokenExpired": "Session expired. Please make a new request"
   },
   "common": {
     "next": "Next"

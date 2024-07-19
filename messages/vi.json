@@ -11,7 +11,8 @@
   "error": {
     "system": "Lỗi hệ thống. Vui lòng thử lại sau",
     "senderInvalid": "Lỗi thiết lập người gửi",
-    "userUnavailable": "Người dùng không tồn tại"
+    "userUnavailable": "Người dùng không tồn tại",
+    "tokenExpired": "Phiên làm việc đã hết. Vui lòng yêu cầu email mới"
   },
   "common": {
     "next": "Tiếp tục"
