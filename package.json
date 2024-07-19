@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^3.4.2",
+    "@tanstack/react-query": "^5.51.9",
+    "axios": "^1.7.2",
     "mongoose": "^8.4.1",
     "next": "14.2.3",
     "next-intl": "^3.14.1",
