@@ -15,7 +15,7 @@ const schema = z.object({
 });
 
 const env = process.env.NODE_ENV;
-const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 const resend = new Resend(process.env.RESEND_API_KEY);
 const senderEmail = process.env.RESEND_SENDER_EMAIL;
 
