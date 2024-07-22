@@ -1,4 +1,4 @@
-import { HomeForm, SelectLocalization } from "../components";
+import { HomeForm } from "../components";
 
 export default function HomePage() {
   return (

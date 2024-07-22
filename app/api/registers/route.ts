@@ -95,7 +95,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    return Response.json(data, { status: 200 });
+    return Response.json(body, { status: 200 });
   } catch (err: any) {
     return Response.json({ ...body, error: err.message }, { status: 400 });
   }

@@ -1,17 +1,19 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { memo, useCallback, useMemo } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { AppButton, AppInput } from "./ui";
+import { useRegisterEmailMutation } from "../services";
 
-type FormData = { email: string };
+type HomeFormType = { email: string };
 
 export const HomeForm = memo(() => {
+  const currentLocale = useLocale();
   const t = useTranslations();
 
-  const validationSchema: z.ZodType<FormData> = useMemo(
+  const validationSchema: z.ZodType<HomeFormType> = useMemo(
     () =>
       z.object({
         email: z
@@ -25,8 +27,9 @@ export const HomeForm = memo(() => {
   const {
     control,
     handleSubmit,
-    formState: { errors, isValid },
-  } = useForm<FormData>({
+    setValue,
+    formState: { errors },
+  } = useForm<HomeFormType>({
     resolver: zodResolver(validationSchema),
     defaultValues: {
       email: "",
@@ -34,13 +37,20 @@ export const HomeForm = memo(() => {
     mode: "onChange",
   });
 
-  const loading = useMemo(() => {
-    return false;
-  }, []);
+  const { mutateAsync: registerAsync, isPending: isLoadingRegisterAsync } =
+    useRegisterEmailMutation({
+      onError: (err) => {
+        console.log(err, "error");
+      },
+      onSuccess: (res) => console.log(res),
+    });
 
-  const onSubmit = useCallback(async (data: FormData) => {
-    console.log(data);
-  }, []);
+  const onSubmit = useCallback(
+    async (data: HomeFormType) => {
+      await registerAsync({ data: data, params: { locale: currentLocale } });
+    },
+    [currentLocale, registerAsync]
+  );
 
   return (
     <form
@@ -63,7 +73,7 @@ export const HomeForm = memo(() => {
       <AppButton
         className="self-end rounded-4 px-16px py-4px bg-primary-dark text-white"
         type="submit"
-        disabled={loading}
+        disabled={isLoadingRegisterAsync}
       >
         {t("common.next")}
       </AppButton>
