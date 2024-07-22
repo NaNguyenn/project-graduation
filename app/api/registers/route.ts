@@ -74,8 +74,10 @@ export async function POST(req: NextRequest) {
     const url = `${baseUrl}/${locale}/register?email=${register.email}&expiredate=${register.expiryDate}&token=${token}`;
 
     const { data, error } = await resend.emails.send({
-      from: isDevMode ? "Acme <onboarding@resend.dev>" : senderEmail || "",
-      to: isDevMode ? senderEmail : body.email,
+      // from: isDevMode ? "Acme <onboarding@resend.dev>" : senderEmail || "",
+      // to: isDevMode ? senderEmail : body.email,
+      from: "Acme <onboarding@resend.dev>",
+      to: senderEmail || "",
       subject: `${t("email.subject")}`,
       html: `<p>${t("email.body")} <a href='${url}'>${url}</a></p>`,
     });
