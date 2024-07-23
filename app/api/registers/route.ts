@@ -64,7 +64,7 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    const url = `${baseUrl}/${locale}/register?email=${register.email}&expiredate=${register.expiryDate}&token=${token}`;
+    const url = `${baseUrl}/${locale}/register?email=${register.email}&expirydate=${register.expiryDate}&token=${token}`;
 
     const { data, error } = await resend.emails.send({
       // from: isDevMode ? "Acme <onboarding@resend.dev>" : senderEmail || "",

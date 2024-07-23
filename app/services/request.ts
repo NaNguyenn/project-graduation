@@ -15,6 +15,16 @@ const request = {
         return Promise.reject(err.response);
       });
   },
+
+  async GET<T, O>(apiConfig: AxiosRequestConfig) {
+    const { url = "" } = apiConfig;
+    return axiosInstance
+      .get<T, O>(url, { ...apiConfig })
+      .then((response: any) => response?.data)
+      .catch((err) => {
+        return Promise.reject(err.response);
+      });
+  },
 };
 
 export default request;

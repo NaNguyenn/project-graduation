@@ -1,21 +1,14 @@
-import { SelectLocalization } from "@/app/components";
-import { RegisterForm } from "./components";
+import { RegisterForm, RegisterFormProps } from "./components";
 
 type Props = {
-  searchParams: { email: string; expiryDate: string; token: string };
+  searchParams: RegisterFormProps;
 };
 
-export default function RegisterPage({
-  searchParams: { email, expiryDate, token },
-}: Props) {
-  console.log("🚀 ~ token:", token);
-  console.log("🚀 ~ expiryDate:", expiryDate);
-  console.log("🚀 ~ email:", email);
-
+export default async function RegisterPage({ searchParams }: Props) {
   return (
     <main className="min-h-screen flex-col flex-center bg-black">
       <div className="p-32px bg-white rounded-8 flex-col">
-        <RegisterForm email={email} />
+        <RegisterForm {...searchParams} />
       </div>
     </main>
   );

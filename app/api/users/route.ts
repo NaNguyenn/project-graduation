@@ -58,12 +58,13 @@ const checkTokenSchema = z.object({
 export async function GET(req: NextRequest) {
   await db();
   const { searchParams } = new URL(req.url);
-  const locale = searchParams.get("locale");
-  const t = await getTranslations({ locale });
 
+  const locale = searchParams.get("locale");
   const token = searchParams.get("token");
   const email = searchParams.get("email");
   const expiryDate = searchParams.get("expiryDate");
+
+  const t = await getTranslations({ locale });
 
   const validation = checkTokenSchema.safeParse({ token, email, expiryDate });
   if (!validation.success)
