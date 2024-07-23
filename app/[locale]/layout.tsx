@@ -3,7 +3,11 @@ import { Inter } from "next/font/google";
 import "../globals.css";
 import { getMessages } from "next-intl/server";
 import { NextIntlClientProvider } from "next-intl";
-import { ReactQueryClientProvider, SelectLocalization } from "../components";
+import {
+  ReactQueryClientProvider,
+  SelectLocalization,
+  ToastNotificationContextProvider,
+} from "../components";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -26,8 +30,10 @@ export default async function RootLayout({
       <html lang={locale}>
         <body className={inter.className}>
           <NextIntlClientProvider messages={messages}>
-            <SelectLocalization />
-            {children}
+            <ToastNotificationContextProvider>
+              <SelectLocalization />
+              {children}
+            </ToastNotificationContextProvider>
           </NextIntlClientProvider>
         </body>
       </html>
