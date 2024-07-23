@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
   const validation = registerUserSchema.safeParse(body);
   if (!validation.success)
     return Response.json(
-      { ...body, error: t("validationMessage.form.invalid") },
+      { message: t("validationMessage.form.invalid") },
       { status: 400 }
     );
 
@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
     const existingRegister = await Register.findOne({ email: body.email });
     if (!existingRegister)
       return Response.json(
-        { ...body, error: t("validationMessage.form.invalid") },
+        { message: t("validationMessage.form.invalid") },
         { status: 404 }
       );
     if (!!body.username) {
@@ -45,7 +45,7 @@ export async function POST(req: NextRequest) {
     await existingRegister.save();
     return Response.json(existingRegister, { status: 200 });
   } catch (err: any) {
-    return Response.json({ ...body, error: err.message }, { status: 400 });
+    return Response.json({ message: err.message }, { status: 400 });
   }
 }
 
@@ -68,7 +68,7 @@ export async function GET(req: NextRequest) {
   const validation = checkTokenSchema.safeParse({ token, email, expiryDate });
   if (!validation.success)
     return Response.json(
-      { error: t("validationMessage.form.invalid") },
+      { message: t("validationMessage.form.invalid") },
       { status: 400 }
     );
 
@@ -79,7 +79,7 @@ export async function GET(req: NextRequest) {
 
     if (!existingRegister) {
       return Response.json(
-        { error: t("validationMessage.form.invalid") },
+        { message: t("validationMessage.form.invalid") },
         { status: 404 }
       );
     }
@@ -89,17 +89,20 @@ export async function GET(req: NextRequest) {
       existingRegister.expiryDate !== validation.data.expiryDate
     ) {
       return Response.json(
-        { error: t("validationMessage.form.invalid") },
+        { message: t("validationMessage.form.invalid") },
         { status: 400 }
       );
     }
 
     if (new Date().valueOf() > existingRegister.expiryDate) {
-      return Response.json({ error: t("error.tokenExpired") }, { status: 400 });
+      return Response.json(
+        { message: t("error.tokenExpired") },
+        { status: 400 }
+      );
     }
 
     return Response.json(existingRegister, { status: 200 });
   } catch (err: any) {
-    return Response.json({ error: err.message }, { status: 400 });
+    return Response.json({ message: err.message }, { status: 400 });
   }
 }

@@ -6,12 +6,15 @@ import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { AppButton, AppInput } from "./ui";
 import { useRegisterEmailMutation } from "../services";
+import { useToast } from "./toast-notification-provider";
+import { getMessage } from "../utils";
 
 type HomeFormType = { email: string };
 
 export const HomeForm = memo(() => {
   const currentLocale = useLocale();
   const t = useTranslations();
+  const { showToast } = useToast();
 
   const validationSchema: z.ZodType<HomeFormType> = useMemo(
     () =>
@@ -27,7 +30,6 @@ export const HomeForm = memo(() => {
   const {
     control,
     handleSubmit,
-    setValue,
     formState: { errors },
   } = useForm<HomeFormType>({
     resolver: zodResolver(validationSchema),
@@ -40,9 +42,10 @@ export const HomeForm = memo(() => {
   const { mutateAsync: registerAsync, isPending: isLoadingRegisterAsync } =
     useRegisterEmailMutation({
       onError: (err) => {
-        console.log(err, "error");
+        showToast({ message: getMessage(err), type: "error" });
       },
-      onSuccess: (res) => console.log(res),
+      onSuccess: () =>
+        showToast({ message: t("pleaseCheckInbox"), type: "success" }),
     });
 
   const onSubmit = useCallback(

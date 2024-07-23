@@ -33,6 +33,7 @@
       "label": "Tên Cơ sở dữ liệu"
     }
   },
+  "successPleaseCheckInbox": "Đăng ký thành công. Vui lòng kiểm tra hòm thư",
   "pleaseCheckInbox": "Vui lòng kiểm tra hòm thư",
   "email": {
     "subject": "Link đăng ký sử dụng dịch vụ",

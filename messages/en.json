@@ -33,6 +33,7 @@
       "label": "Database Name"
     }
   },
+  "successPleaseCheckInbox": "Registered successfully. Please check your inbox",
   "pleaseCheckInbox": "Please check your inbox",
   "email": {
     "subject": "Service registration link",

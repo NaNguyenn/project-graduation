@@ -1,14 +1,10 @@
 import { getTranslations } from "next-intl/server";
 import { NextRequest } from "next/server";
-import crypto from "crypto";
 import { z } from "zod";
 import db from "../db";
 import Register, { RegisterType } from "../models/Register";
 import { Resend } from "resend";
-
-const generateUniqueToken = () => {
-  return crypto.randomBytes(32).toString("hex");
-};
+import { generateUniqueToken } from "@/app/utils";
 
 const schema = z.object({
   email: z.string().min(1).email(),
@@ -28,7 +24,7 @@ export async function POST(req: NextRequest) {
 
   if (!schema.safeParse({ email: senderEmail }).success) {
     return Response.json(
-      { error: t(isDevMode ? "error.senderInvalid" : "error.system") },
+      { message: t(isDevMode ? "error.senderInvalid" : "error.system") },
       { status: 500 }
     );
   }
@@ -37,7 +33,7 @@ export async function POST(req: NextRequest) {
   const validation = schema.safeParse(body);
   if (!validation.success)
     return Response.json(
-      { ...body, error: t("validationMessage.form.invalid") },
+      { message: t("validationMessage.form.invalid") },
       { status: 400 }
     );
 
@@ -51,10 +47,7 @@ export async function POST(req: NextRequest) {
       existingRegister &&
       new Date().valueOf() <= existingRegister.expiryDate
     ) {
-      return Response.json(
-        { ...body, error: t("pleaseCheckInbox") },
-        { status: 400 }
-      );
+      return Response.json({ message: t("pleaseCheckInbox") }, { status: 400 });
     }
 
     if (existingRegister) {
@@ -90,13 +83,13 @@ export async function POST(req: NextRequest) {
       await register.save();
     } catch (error) {
       return Response.json(
-        { error: isDevMode ? error : t("error.system") },
+        { message: isDevMode ? error : t("error.system") },
         { status: 500 }
       );
     }
 
     return Response.json(body, { status: 200 });
   } catch (err: any) {
-    return Response.json({ ...body, error: err.message }, { status: 400 });
+    return Response.json({ message: err.message }, { status: 400 });
   }
 }
