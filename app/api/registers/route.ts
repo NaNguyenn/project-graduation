@@ -67,6 +67,15 @@ export async function POST(req: NextRequest) {
       });
     }
 
+    try {
+      await register.save();
+    } catch (error) {
+      return Response.json(
+        { message: isDevMode ? error : t("error.system") },
+        { status: 500 }
+      );
+    }
+
     const url = `${baseUrl}/${locale}/register?email=${register.email}&expirydate=${register.expiryDate}&token=${token}`;
 
     const { data, error } = await resend.emails.send({
@@ -81,16 +90,9 @@ export async function POST(req: NextRequest) {
     });
 
     if (error) {
-      return Response.json({ error }, { status: 500 });
-    }
-
-    try {
-      await register.save();
-    } catch (error) {
-      return Response.json(
-        { message: isDevMode ? error : t("error.system") },
-        { status: 500 }
-      );
+      return Response.json(isDevMode ? error : { message: t("error.system") }, {
+        status: 500,
+      });
     }
 
     return Response.json(body, { status: 200 });

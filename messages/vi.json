@@ -39,6 +39,8 @@
   "pleaseCheckInbox": "Vui lòng kiểm tra hòm thư",
   "email": {
     "subject": "Link đăng ký sử dụng dịch vụ",
-    "body": "Truy cập đường dẫn này để tiếp tục quá trình đăng ký. Đường dẫn sẽ hết hiệu lực sau"
+    "body": "Truy cập đường dẫn này để tiếp tục quá trình đăng ký. Đường dẫn sẽ hết hiệu lực sau",
+    "registerUserSuccess": "Đăng ký dịch vụ thành công.",
+    "registerUserSuccessSubject": "Thông tin dịch vụ"
   }
 }

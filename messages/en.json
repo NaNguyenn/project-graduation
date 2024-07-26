@@ -39,6 +39,8 @@
   "pleaseCheckInbox": "Please check your inbox",
   "email": {
     "subject": "Service registration link",
-    "body": "Follow this link to continue your registration process. This link will expire after"
+    "body": "Follow this link to continue your registration process. This link will expire after",
+    "registerUserSuccess": "Service registered successfully.",
+    "registerUserSuccessSubject": "Registered service infos"
   }
 }
