@@ -103,20 +103,39 @@ export const RegisterForm = memo(
       mode: "onChange",
     });
 
+    const handleSubmitSuccess = useCallback(() => {
+      router.push("/");
+      showToast({ message: t("registerUserSuccess"), type: "success" });
+    }, [router, showToast, t]);
+
     const { mutateAsync: registerAsync, isPending: isLoadingRegisterAsync } =
       useRegisterUserMutation({
         onError: (err) => {
           showToast({ message: getMessage(err), type: "error" });
         },
-        onSuccess: () =>
-          showToast({ message: t("pleaseCheckInbox"), type: "success" }),
+        onSuccess: () => handleSubmitSuccess(),
       });
 
     const onSubmit = useCallback(
       async (data: RegisterFormType) => {
+        if (
+          data.account === checkTokenRes?.account &&
+          data.databaseName === checkTokenRes?.databaseName &&
+          data.username === checkTokenRes?.username
+        ) {
+          handleSubmitSuccess();
+          return;
+        }
         await registerAsync({ data: data, params: { locale: currentLocale } });
       },
-      [currentLocale, registerAsync]
+      [
+        checkTokenRes?.account,
+        checkTokenRes?.databaseName,
+        checkTokenRes?.username,
+        currentLocale,
+        handleSubmitSuccess,
+        registerAsync,
+      ]
     );
 
     const loading = useMemo(() => {
