@@ -1,9 +1,12 @@
 "use client";
+import { useToast } from "@/app/components";
 import { AppInput, AppButton } from "@/app/components/ui";
-import { regexNoSpecialCharsOrSpaces } from "@/app/utils";
+import { useCheckTokenQuery, useRegisterUserMutation } from "@/app/services";
+import { getMessage, regexNoSpecialCharsOrSpaces } from "@/app/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useTranslations } from "next-intl";
-import { memo, useCallback, useMemo } from "react";
+import { useLocale, useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
+import { memo, useCallback, useEffect, useMemo } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -13,7 +16,7 @@ export type RegisterFormProps = {
   token: string;
 };
 
-type FormData = {
+type RegisterFormType = {
   email: string;
   username?: string;
   account?: string;
@@ -23,8 +26,34 @@ type FormData = {
 export const RegisterForm = memo(
   ({ email, expirydate, token }: RegisterFormProps) => {
     const t = useTranslations();
+    const { showToast } = useToast();
+    const currentLocale = useLocale();
+    const router = useRouter();
 
-    const validationSchema: z.ZodType<FormData> = useMemo(
+    const {
+      data: checkTokenRes,
+      error: checkTokenErr,
+      isLoading: isLoadingCheckToken,
+    } = useCheckTokenQuery(
+      {
+        email,
+        expiryDate: expirydate,
+        token,
+        locale: currentLocale,
+      },
+      {
+        enabled: !!email && !!expirydate && !!token && !!currentLocale,
+        retry: false,
+      }
+    );
+    useEffect(() => {
+      if (checkTokenErr) {
+        router.replace("/");
+        showToast({ message: getMessage(checkTokenErr), type: "error" });
+      }
+    }, [checkTokenErr, router, showToast]);
+
+    const validationSchema: z.ZodType<RegisterFormType> = useMemo(
       () =>
         z.object({
           email: z.string().min(1).email(),
@@ -57,7 +86,7 @@ export const RegisterForm = memo(
       control,
       handleSubmit,
       formState: { errors },
-    } = useForm<FormData>({
+    } = useForm<RegisterFormType>({
       resolver: zodResolver(validationSchema),
       defaultValues: {
         email: email,
@@ -65,16 +94,34 @@ export const RegisterForm = memo(
         account: "",
         databaseName: "",
       },
+      values: {
+        email: checkTokenRes?.email || email,
+        username: checkTokenRes?.username || "",
+        account: checkTokenRes?.account || "",
+        databaseName: checkTokenRes?.databaseName || "",
+      },
       mode: "onChange",
     });
 
-    const loading = useMemo(() => {
-      return false;
-    }, []);
+    const { mutateAsync: registerAsync, isPending: isLoadingRegisterAsync } =
+      useRegisterUserMutation({
+        onError: (err) => {
+          showToast({ message: getMessage(err), type: "error" });
+        },
+        onSuccess: () =>
+          showToast({ message: t("pleaseCheckInbox"), type: "success" }),
+      });
 
-    const onSubmit = useCallback(async (data: FormData) => {
-      console.log(data);
-    }, []);
+    const onSubmit = useCallback(
+      async (data: RegisterFormType) => {
+        await registerAsync({ data: data, params: { locale: currentLocale } });
+      },
+      [currentLocale, registerAsync]
+    );
+
+    const loading = useMemo(() => {
+      return isLoadingRegisterAsync || isLoadingCheckToken;
+    }, [isLoadingCheckToken, isLoadingRegisterAsync]);
 
     return (
       <form

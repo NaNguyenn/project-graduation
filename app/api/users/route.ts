@@ -68,10 +68,7 @@ export async function GET(req: NextRequest) {
 
   const validation = checkTokenSchema.safeParse({ token, email, expiryDate });
   if (!validation.success)
-    return Response.json(
-      { message: t("validationMessage.form.invalid") },
-      { status: 400 }
-    );
+    return Response.json({ message: t("error.tokenInvalid") }, { status: 400 });
 
   try {
     const existingRegister = await Register.findOne({
@@ -80,7 +77,7 @@ export async function GET(req: NextRequest) {
 
     if (!existingRegister) {
       return Response.json(
-        { message: t("validationMessage.form.invalid") },
+        { message: t("error.tokenInvalid") },
         { status: 404 }
       );
     }
@@ -90,7 +87,7 @@ export async function GET(req: NextRequest) {
       existingRegister.expiryDate !== validation.data.expiryDate
     ) {
       return Response.json(
-        { message: t("validationMessage.form.invalid") },
+        { message: t("error.tokenInvalid") },
         { status: 400 }
       );
     }
