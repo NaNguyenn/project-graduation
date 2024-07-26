@@ -1,3 +1,5 @@
+import { exec } from "child_process";
+import util from "util";
 import { getTranslations } from "next-intl/server";
 import { NextRequest } from "next/server";
 import { z } from "zod";
@@ -16,6 +18,7 @@ const registerUserSchema = z.object({
 const env = process.env.NODE_ENV;
 const resend = new Resend(process.env.RESEND_API_KEY);
 const senderEmail = process.env.RESEND_SENDER_EMAIL;
+const execPromise = util.promisify(exec);
 
 export async function POST(req: NextRequest) {
   await db();
@@ -48,6 +51,17 @@ export async function POST(req: NextRequest) {
     }
     if (!!body.databaseName) {
       existingRegister.databaseName = body.databaseName;
+    }
+
+    const shellCommand = `echo 'Hello World'`;
+
+    try {
+      const { stdout, stderr } = await execPromise(shellCommand);
+      if (stderr) {
+        return Response.json({ message: t("error.system") }, { status: 500 });
+      }
+    } catch (error) {
+      return Response.json({ message: t("error.system") }, { status: 500 });
     }
 
     try {
