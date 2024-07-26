@@ -5,6 +5,7 @@ import db from "../db";
 import Register, { RegisterType } from "../models/Register";
 import { Resend } from "resend";
 import { generateUniqueToken } from "@/app/utils";
+import { EXPIRY_TIME_IN_MINUTES } from "@/app/utils/constants";
 
 const schema = z.object({
   email: z.string().min(1).email(),
@@ -39,7 +40,9 @@ export async function POST(req: NextRequest) {
 
   try {
     const existingRegister = await Register.findOne({ email: body.email });
-    const expiryDate = new Date(Date.now() + 60 * 60 * 1000).valueOf();
+    const expiryDate = new Date(
+      Date.now() + EXPIRY_TIME_IN_MINUTES * 60 * 1000
+    ).valueOf();
     let register: RegisterType;
     let token: string;
 
@@ -72,7 +75,9 @@ export async function POST(req: NextRequest) {
       from: "Acme <onboarding@resend.dev>",
       to: senderEmail || "",
       subject: `${t("email.subject")}`,
-      html: `<p>${t("email.body")} <a href='${url}'>${url}</a></p>`,
+      html: `<p>${t(
+        "email.body"
+      )} ${EXPIRY_TIME_IN_MINUTES}': <a href='${url}'>${url}</a></p>`,
     });
 
     if (error) {

@@ -35,9 +35,10 @@
     }
   },
   "successPleaseCheckInbox": "Registered successfully. Please check your inbox",
+  "registerUserSuccess": "Update service infos successfully. You can repeat the process to check registered infos",
   "pleaseCheckInbox": "Please check your inbox",
   "email": {
     "subject": "Service registration link",
-    "body": "Follow this link to continue your registration process"
+    "body": "Follow this link to continue your registration process. This link will expire after"
   }
 }
