@@ -15,10 +15,12 @@ const env = process.env.NODE_ENV;
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 const resend = new Resend(process.env.RESEND_API_KEY);
 const senderEmail = process.env.RESEND_SENDER_EMAIL;
+const devEmail = process.env.DEV_EMAIL;
 
 export async function POST(req: NextRequest) {
   await db();
   const isDevMode = env === "development";
+  const isSenderNotConfigured = senderEmail === devEmail;
   const { searchParams } = new URL(req.url);
   const locale = searchParams.get("locale");
   const t = await getTranslations({ locale });
@@ -79,10 +81,10 @@ export async function POST(req: NextRequest) {
     const url = `${baseUrl}/${locale}/register?email=${register.email}&expirydate=${register.expiryDate}&token=${token}`;
 
     const { data, error } = await resend.emails.send({
-      // from: isDevMode ? "Acme <onboarding@resend.dev>" : senderEmail || "",
-      // to: isDevMode ? senderEmail : body.email,
-      from: "Acme <onboarding@resend.dev>",
-      to: senderEmail || "",
+      from: isSenderNotConfigured
+        ? "Acme <onboarding@resend.dev>"
+        : senderEmail || "",
+      to: isSenderNotConfigured ? devEmail || "" : body.email,
       subject: `${t("email.subject")}`,
       html: `<p>${t(
         "email.body"
