@@ -1,4 +1,4 @@
-import { exec } from "child_process";
+import { exec, spawn } from "child_process";
 import util from "util";
 import { getTranslations } from "next-intl/server";
 import { NextRequest } from "next/server";
@@ -7,6 +7,8 @@ import db from "../db";
 import { regexNoSpecialCharsOrSpaces } from "@/app/utils";
 import Register from "../models/Register";
 import { Resend } from "resend";
+import { fileURLToPath } from "url";
+import path from "path/posix";
 
 const registerUserSchema = z.object({
   email: z.string().min(1).email(),
@@ -19,7 +21,6 @@ const env = process.env.NODE_ENV;
 const resend = new Resend(process.env.RESEND_API_KEY);
 const senderEmail = process.env.RESEND_SENDER_EMAIL;
 const devEmail = process.env.DEV_EMAIL;
-const execPromise = util.promisify(exec);
 
 export async function POST(req: NextRequest) {
   await db();
@@ -55,16 +56,25 @@ export async function POST(req: NextRequest) {
       existingRegister.databaseName = body.databaseName;
     }
 
-    const shellCommand = `echo 'Hello World'`;
+    const scriptPath = path.join(
+      path.dirname(fileURLToPath(import.meta.url)),
+      "..",
+      "scripts",
+      "ssh.ps1"
+    );
+    const child = spawn("powershell.exe", [scriptPath, "NGuyenNguyenn"]);
+    child.stdout.on("data", (data) => {
+      console.log(data.toString());
+    });
 
-    try {
-      const { stdout, stderr } = await execPromise(shellCommand);
-      if (stderr) {
-        return Response.json({ message: t("error.system") }, { status: 500 });
-      }
-    } catch (error) {
+    child.stderr.on("data", (err) => {
+      console.error(err.toString());
       return Response.json({ message: t("error.system") }, { status: 500 });
-    }
+    });
+
+    child.on("exit", (code) => {
+      console.log(`Child process exited with code ${code}`);
+    });
 
     try {
       await existingRegister.save();
