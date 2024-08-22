@@ -46,35 +46,50 @@ export async function POST(req: NextRequest) {
         { status: 404 }
       );
 
-    if (!!body.username) {
+    if (!!body.username && !existingRegister.username) {
+      const scriptPath = path.join(
+        path.dirname(fileURLToPath(import.meta.url)),
+        "..",
+        "scripts",
+        "ssh.ps1"
+      );
+
+      const result = await new Promise<{ status: number; message: string }>(
+        (resolve) => {
+          const shellInstance = spawn("powershell.exe", [
+            scriptPath,
+            "NGuyenNguyenn",
+          ]);
+
+          let isShellError = false;
+
+          shellInstance.stdout.on("data", (data) => {
+            console.log(data.toString());
+          });
+
+          shellInstance.stderr.on("data", (err) => {
+            isShellError = true;
+            console.error(err.toString());
+          });
+
+          shellInstance.on("exit", (code) => {
+            if (isShellError) {
+              resolve({ status: 500, message: t("error.system") });
+            } else {
+              console.log(`Child process exited with code ${code}`);
+              resolve({ status: 200, message: body });
+            }
+          });
+        }
+      );
       existingRegister.username = body.username;
     }
-    if (!!body.account) {
+    if (!!body.account && !existingRegister.account) {
       existingRegister.account = body.account;
     }
-    if (!!body.databaseName) {
+    if (!!body.databaseName && !existingRegister.databaseName) {
       existingRegister.databaseName = body.databaseName;
     }
-
-    const scriptPath = path.join(
-      path.dirname(fileURLToPath(import.meta.url)),
-      "..",
-      "scripts",
-      "ssh.ps1"
-    );
-    const child = spawn("powershell.exe", [scriptPath, "NGuyenNguyenn"]);
-    child.stdout.on("data", (data) => {
-      console.log(data.toString());
-    });
-
-    child.stderr.on("data", (err) => {
-      console.error(err.toString());
-      return Response.json({ message: t("error.system") }, { status: 500 });
-    });
-
-    child.on("exit", (code) => {
-      console.log(`Child process exited with code ${code}`);
-    });
 
     try {
       await existingRegister.save();
@@ -96,17 +111,19 @@ export async function POST(req: NextRequest) {
     ${t("email.registerUserSuccess")}
     ${
       !!body.username
-        ? `${t("register.inputUsername.label")}: ${body.username};`
+        ? `${t("register.inputUsername.label")}: <b>${body.username}</b>;`
         : ""
     }
     ${
       !!body.account
-        ? `${t("register.inputAccount.label")}: ${body.account};`
+        ? `${t("register.inputAccount.label")}: <b>${body.account}</b>;`
         : ""
     }
     ${
       !!body.databaseName
-        ? `${t("register.inputDatabaseName.label")}: ${body.databaseName};`
+        ? `${t("register.inputDatabaseName.label")}: <b>${
+            body.databaseName
+          }</b>;`
         : ""
     }
   </p>
