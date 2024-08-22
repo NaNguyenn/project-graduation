@@ -25,13 +25,13 @@
   },
   "register": {
     "inputUsername": {
-      "label": "Tên đăng nhập"
+      "label": "Tên đăng nhập server"
     },
     "inputAccount": {
-      "label": "Tài khoản"
+      "label": "Tài khoản Mysql"
     },
     "inputDatabaseName": {
-      "label": "Tên Cơ sở dữ liệu"
+      "label": "Tên Cơ sở dữ liệu Mysql"
     }
   },
   "successPleaseCheckInbox": "Đăng ký thành công. Vui lòng kiểm tra hòm thư",

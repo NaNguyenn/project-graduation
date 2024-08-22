@@ -25,13 +25,13 @@
   },
   "register": {
     "inputUsername": {
-      "label": "Username"
+      "label": "Server username"
     },
     "inputAccount": {
-      "label": "Account"
+      "label": "MySQL Account"
     },
     "inputDatabaseName": {
-      "label": "Database Name"
+      "label": "MySQL Database Name"
     }
   },
   "successPleaseCheckInbox": "Registered successfully. Please check your inbox",
