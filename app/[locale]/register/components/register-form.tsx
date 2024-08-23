@@ -80,13 +80,23 @@ export const RegisterForm = memo(
               )
               .optional(),
           })
-          .refine((form) => !!form.account && !form.databaseName, {
-            message: t("validationMessage.form.required"),
-            path: ["databaseName"],
-          })
-          .refine((form) => !!form.databaseName && !form.account, {
-            message: t("validationMessage.form.required"),
-            path: ["account"],
+          .superRefine((form, ctx) => {
+            if (!!form.account && !form.databaseName) {
+              ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                path: ["databaseName"],
+                fatal: true,
+                message: t("validationMessage.required"),
+              });
+            }
+            if (!!form.databaseName && !form.account) {
+              ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                path: ["account"],
+                fatal: true,
+                message: t("validationMessage.required"),
+              });
+            }
           }),
       [t]
     );
@@ -94,6 +104,7 @@ export const RegisterForm = memo(
     const {
       control,
       handleSubmit,
+      watch,
       formState: { errors },
     } = useForm<RegisterFormType>({
       resolver: zodResolver(validationSchema),
@@ -112,6 +123,8 @@ export const RegisterForm = memo(
       mode: "onChange",
     });
 
+    const { account } = watch();
+
     const handleSubmitSuccess = useCallback(() => {
       router.push("/");
       showToast({ message: t("registerUserSuccess"), type: "success" });
@@ -128,9 +141,10 @@ export const RegisterForm = memo(
     const onSubmit = useCallback(
       async (data: RegisterFormType) => {
         if (
-          data.account === checkTokenRes?.account &&
-          data.databaseName === checkTokenRes?.databaseName &&
-          data.username === checkTokenRes?.username
+          (data.account === checkTokenRes?.account &&
+            data.databaseName === checkTokenRes?.databaseName &&
+            data.username === checkTokenRes?.username) ||
+          (!data.account && !data.databaseName && !data.username)
         ) {
           handleSubmitSuccess();
           return;

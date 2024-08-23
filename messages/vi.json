@@ -35,7 +35,7 @@
     }
   },
   "successPleaseCheckInbox": "Đăng ký thành công. Vui lòng kiểm tra hòm thư",
-  "registerUserSuccess": "Cập nhật thông tin dịch vụ thành công. Bạn có thể lặp lại quá trình để kiểm tra thông tin đã đăng ký",
+  "registerUserSuccess": "Đăng ký dịch vụ thành công. Bạn có thể lặp lại quá trình để kiểm tra thông tin đã đăng ký",
   "pleaseCheckInbox": "Vui lòng kiểm tra hòm thư",
   "email": {
     "subject": "Link đăng ký sử dụng dịch vụ",
