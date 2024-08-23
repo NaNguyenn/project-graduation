@@ -55,30 +55,39 @@ export const RegisterForm = memo(
 
     const validationSchema: z.ZodType<RegisterFormType> = useMemo(
       () =>
-        z.object({
-          email: z.string().min(1).email(),
-          username: z
-            .string()
-            .regex(
-              regexNoSpecialCharsOrSpaces,
-              t("validationMessage.form.invalid")
-            )
-            .optional(),
-          account: z
-            .string()
-            .regex(
-              regexNoSpecialCharsOrSpaces,
-              t("validationMessage.form.invalid")
-            )
-            .optional(),
-          databaseName: z
-            .string()
-            .regex(
-              regexNoSpecialCharsOrSpaces,
-              t("validationMessage.form.invalid")
-            )
-            .optional(),
-        }),
+        z
+          .object({
+            email: z.string().min(1).email(),
+            username: z
+              .string()
+              .regex(
+                regexNoSpecialCharsOrSpaces,
+                t("validationMessage.form.invalid")
+              )
+              .optional(),
+            account: z
+              .string()
+              .regex(
+                regexNoSpecialCharsOrSpaces,
+                t("validationMessage.form.invalid")
+              )
+              .optional(),
+            databaseName: z
+              .string()
+              .regex(
+                regexNoSpecialCharsOrSpaces,
+                t("validationMessage.form.invalid")
+              )
+              .optional(),
+          })
+          .refine((form) => !!form.account && !form.databaseName, {
+            message: t("validationMessage.form.required"),
+            path: ["databaseName"],
+          })
+          .refine((form) => !!form.databaseName && !form.account, {
+            message: t("validationMessage.form.required"),
+            path: ["account"],
+          }),
       [t]
     );
 
@@ -126,11 +135,20 @@ export const RegisterForm = memo(
           handleSubmitSuccess();
           return;
         }
-        await registerAsync({ data: data, params: { locale: currentLocale } });
+        await registerAsync({
+          data: {
+            email: checkTokenRes?.email || data.email,
+            username: checkTokenRes?.username || data.username,
+            account: checkTokenRes?.account || data.account,
+            databaseName: checkTokenRes?.databaseName || data.databaseName,
+          },
+          params: { locale: currentLocale },
+        });
       },
       [
         checkTokenRes?.account,
         checkTokenRes?.databaseName,
+        checkTokenRes?.email,
         checkTokenRes?.username,
         currentLocale,
         handleSubmitSuccess,
@@ -157,6 +175,7 @@ export const RegisterForm = memo(
               errorText={errors.username?.message}
               onChange={onChange}
               value={value}
+              disabled={!!checkTokenRes?.username}
             />
           )}
         />
@@ -170,6 +189,7 @@ export const RegisterForm = memo(
               errorText={errors.account?.message}
               onChange={onChange}
               value={value}
+              disabled={!!checkTokenRes?.account}
             />
           )}
         />
@@ -183,6 +203,7 @@ export const RegisterForm = memo(
               errorText={errors.databaseName?.message}
               onChange={onChange}
               value={value}
+              disabled={!!checkTokenRes?.databaseName}
             />
           )}
         />
