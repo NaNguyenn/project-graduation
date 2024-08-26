@@ -1,12 +1,7 @@
 #!/bin/bash
 
-if [ "$#" -ne 2 ]; then
-    echo "Invalid inputs"
-    exit 1
-fi
-
 MySQLAccount=$1
-MySQLDatabaseName=$3
+MySQLDatabaseName=$2
 
 tmpfile=$(mktemp)
 

@@ -1,5 +1,4 @@
-import { exec, spawn } from "child_process";
-import util from "util";
+import { spawn } from "child_process";
 import { getTranslations } from "next-intl/server";
 import { NextRequest } from "next/server";
 import { z } from "zod";
@@ -143,23 +142,19 @@ export async function POST(req: NextRequest) {
       }
       await existingRegister.save();
     } catch (error) {
-      // if (body.username) {
-      //   await runScript("delete_ssh_account.ps1", body.username);
-      // }
-      // if (body.account && body.databaseName) {
-      //   await runScript(
-      //     "delete_mysql_account_and_database.ps1",
-      //     body.account,
-      //     body.databaseName
-      //   );
-      // }
+      if (body.username) {
+        await runScript("delete-ssh.sh", body.username);
+      }
+      if (body.account && body.databaseName) {
+        await runScript("delete-mysql.sh", body.account, body.databaseName);
+      }
       return Response.json(
         { message: isDevMode ? error : t("error.system") },
         { status: 500 }
       );
     }
 
-    const { data, error } = await resend.emails.send({
+    await resend.emails.send({
       from: isSenderNotConfigured
         ? "Acme <onboarding@resend.dev>"
         : senderEmail || "",
@@ -190,12 +185,64 @@ export async function POST(req: NextRequest) {
       `,
     });
 
-    if (error) {
-      console.error("Failed to send email:", error);
-    }
-
     return Response.json(existingRegister, { status: 201 });
   } catch (err: any) {
     return Response.json({ message: t("error.system") }, { status: 500 });
+  }
+}
+
+const checkTokenSchema = z.object({
+  token: z.string().min(1),
+  email: z.string().min(1).email(),
+  expiryDate: z.string().min(1),
+});
+
+export async function GET(req: NextRequest) {
+  await db();
+  const { searchParams } = new URL(req.url);
+
+  const locale = searchParams.get("locale");
+  const token = searchParams.get("token");
+  const email = searchParams.get("email");
+  const expiryDate = searchParams.get("expiryDate");
+
+  const t = await getTranslations({ locale });
+
+  const validation = checkTokenSchema.safeParse({ token, email, expiryDate });
+  if (!validation.success)
+    return Response.json({ message: t("error.tokenInvalid") }, { status: 400 });
+
+  try {
+    const existingRegister = await Register.findOne({
+      email: validation.data.email,
+    });
+
+    if (!existingRegister) {
+      return Response.json(
+        { message: t("error.tokenInvalid") },
+        { status: 404 }
+      );
+    }
+
+    if (
+      existingRegister.token !== validation.data.token ||
+      existingRegister.expiryDate !== validation.data.expiryDate
+    ) {
+      return Response.json(
+        { message: t("error.tokenInvalid") },
+        { status: 400 }
+      );
+    }
+
+    if (new Date().valueOf() > existingRegister.expiryDate) {
+      return Response.json(
+        { message: t("error.tokenExpired") },
+        { status: 400 }
+      );
+    }
+
+    return Response.json(existingRegister, { status: 200 });
+  } catch (err: any) {
+    return Response.json({ message: err.message }, { status: 400 });
   }
 }
