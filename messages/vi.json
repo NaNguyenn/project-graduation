@@ -13,7 +13,8 @@
     "senderInvalid": "Lỗi thiết lập người gửi",
     "userUnavailable": "Người dùng không tồn tại",
     "tokenExpired": "Phiên làm việc đã hết. Vui lòng yêu cầu email mới",
-    "tokenInvalid": "Token không hợp lệ. Vui lòng yêu cầu email mới"
+    "tokenInvalid": "Token không hợp lệ. Vui lòng yêu cầu email mới",
+    "existingResource": "Tên tài nguyên không hợp lệ. Vui lòng sử dụng các tên tài nguyên khác"
   },
   "common": {
     "next": "Tiếp tục"

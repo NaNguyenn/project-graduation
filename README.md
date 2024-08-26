@@ -14,3 +14,8 @@ yarn dev
 sudo mysql -u root
 SHOW DATABASES;
 SELECT User, Host FROM mysql.user;
+
+<!-- Test created SSH user -->
+
+hostname -I
+ssh username@ipaddress

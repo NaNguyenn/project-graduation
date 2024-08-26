@@ -13,7 +13,8 @@
     "senderInvalid": "Sender configuration error",
     "userUnavailable": "User not existed",
     "tokenExpired": "Session expired. Please make a new request",
-    "tokenInvalid": "Token invalid. Please make a new request"
+    "tokenInvalid": "Token invalid. Please make a new request",
+    "existingResource": "Invalid resource names. Please change resource names"
   },
   "common": {
     "next": "Next"

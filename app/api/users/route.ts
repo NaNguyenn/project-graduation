@@ -21,49 +21,6 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 const senderEmail = process.env.RESEND_SENDER_EMAIL;
 const devEmail = process.env.DEV_EMAIL;
 
-const runScript = async (
-  scriptName: string,
-  ...args: string[]
-): Promise<{ status: number; message: string }> => {
-  const scriptPath = path.join(
-    path.dirname(fileURLToPath(import.meta.url)),
-    "..",
-    "scripts",
-    scriptName
-  );
-
-  return new Promise((resolve) => {
-    const shellInstance = spawn("bash", [scriptPath, ...args]);
-
-    let isShellError = false;
-    let errorMessage = "";
-    let outputMessage = "";
-
-    shellInstance.stdout.on("data", (data) => {
-      outputMessage += data.toString();
-      console.log(data.toString());
-    });
-
-    shellInstance.stderr.on("data", (err) => {
-      isShellError = true;
-      errorMessage += err.toString();
-      console.error(err.toString());
-    });
-
-    shellInstance.on("exit", (code) => {
-      console.log(`Child process exited with code ${code}`);
-      if (isShellError) {
-        resolve({
-          status: 500,
-          message: errorMessage || "Script execution failed",
-        });
-      } else {
-        resolve({ status: 200, message: outputMessage || "Success" });
-      }
-    });
-  });
-};
-
 export async function POST(req: NextRequest) {
   await db();
   const isDevMode = env === "development";
@@ -71,6 +28,49 @@ export async function POST(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const locale = searchParams.get("locale");
   const t = await getTranslations({ locale });
+
+  const runScript = async (
+    scriptName: string,
+    ...args: string[]
+  ): Promise<{ status: number; message: string }> => {
+    const scriptPath = path.join(
+      path.dirname(fileURLToPath(import.meta.url)),
+      "..",
+      "scripts",
+      scriptName
+    );
+
+    return new Promise((resolve) => {
+      const shellInstance = spawn("bash", [scriptPath, ...args]);
+
+      let isShellError = false;
+      let errorMessage = "";
+      let outputMessage = "";
+
+      shellInstance.stdout.on("data", (data) => {
+        outputMessage += data.toString();
+        console.log(data.toString());
+      });
+
+      shellInstance.stderr.on("data", (err) => {
+        isShellError = true;
+        errorMessage += err.toString();
+        console.error(err.toString());
+      });
+
+      shellInstance.on("exit", (code) => {
+        console.log(`Child process exited with code ${code}`);
+        if (isShellError) {
+          resolve({
+            status: 500,
+            message: isDevMode ? errorMessage : t("error.system"),
+          });
+        } else {
+          resolve({ status: 200, message: outputMessage || "Success" });
+        }
+      });
+    });
+  };
 
   const body = await req.json();
   const validation = registerUserSchema.safeParse(body);
@@ -97,7 +97,7 @@ export async function POST(req: NextRequest) {
     });
     if (existingResource) {
       return Response.json(
-        { message: t("validationMessage.userExists") },
+        { message: t("error.existingResource") },
         { status: 409 }
       );
     }
