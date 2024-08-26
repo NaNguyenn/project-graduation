@@ -102,8 +102,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const createdResources = [];
-
     if (body.username) {
       const sshResult = await runScript("create-ssh.sh", body.username);
       if (sshResult.status !== 200) {
@@ -112,7 +110,6 @@ export async function POST(req: NextRequest) {
           { status: sshResult.status }
         );
       }
-      createdResources.push("SSH account");
     }
 
     if (body.account && body.databaseName) {
@@ -127,7 +124,6 @@ export async function POST(req: NextRequest) {
           { status: mysqlResult.status }
         );
       }
-      createdResources.push("MySQL account and database");
     }
 
     try {
@@ -181,7 +177,6 @@ export async function POST(req: NextRequest) {
               : ""
           }
         </p>
-        <p>Created resources: ${createdResources.join(", ")}</p>
       `,
     });
 
