@@ -1,6 +1,11 @@
 {
   "validationMessage": {
     "required": "This field is required",
+    "password": {
+      "notMatched": "Password not matched",
+      "invalid": "Password requires at least 8 characters, including a lowercase letter, an uppercase letter, a number, and a special character",
+      "containUsername": "Password cannot contain username"
+    },
     "email": {
       "invalid": "Invalid email format"
     },
@@ -28,12 +33,22 @@
     "inputUsername": {
       "label": "Server username"
     },
+    "password": {
+      "label": "Password"
+    },
+    "passwordConfirm": {
+      "label": "Confirm password"
+    },
     "inputAccount": {
       "label": "MySQL Account"
     },
     "inputDatabaseName": {
       "label": "MySQL Database Name"
     }
+  },
+  "resource": {
+    "serverAccount": "linux server account",
+    "databaseMysql": "MySQL database"
   },
   "successPleaseCheckInbox": "Registered successfully. Please check your inbox",
   "registerUserSuccess": "Services registered successfully. You can repeat the process to check registered infos",

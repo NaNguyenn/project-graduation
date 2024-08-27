@@ -2,7 +2,11 @@
 import { useToast } from "@/app/components";
 import { AppInput, AppButton } from "@/app/components/ui";
 import { useCheckTokenQuery, useRegisterUserMutation } from "@/app/services";
-import { getMessage, regexNoSpecialCharsOrSpaces } from "@/app/utils";
+import {
+  getMessage,
+  regexNoSpecialCharsOrSpaces,
+  regexPassword,
+} from "@/app/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
@@ -19,7 +23,11 @@ export type RegisterFormProps = {
 type RegisterFormType = {
   email: string;
   username?: string;
+  passwordSsh?: string;
+  passwordSshConfirm?: string;
   account?: string;
+  passwordMysql?: string;
+  passwordMysqlConfirm?: string;
   databaseName?: string;
 };
 
@@ -65,6 +73,11 @@ export const RegisterForm = memo(
                 t("validationMessage.form.invalid")
               )
               .optional(),
+            passwordSsh: z
+              .string()
+              .regex(regexPassword, t("validationMessage.password.invalid"))
+              .optional(),
+            passwordSshConfirm: z.string().optional(),
             account: z
               .string()
               .regex(
@@ -72,6 +85,11 @@ export const RegisterForm = memo(
                 t("validationMessage.form.invalid")
               )
               .optional(),
+            passwordMysql: z
+              .string()
+              .regex(regexPassword, t("validationMessage.password.invalid"))
+              .optional(),
+            passwordMysqlConfirm: z.string().optional(),
             databaseName: z
               .string()
               .regex(
@@ -80,7 +98,68 @@ export const RegisterForm = memo(
               )
               .optional(),
           })
-          .superRefine((form, ctx) => {
+          .superRefine((form: RegisterFormType, ctx) => {
+            if (!!form.passwordSsh && !form.username) {
+              ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                path: ["username"],
+                fatal: true,
+                message: t("validationMessage.required"),
+              });
+            }
+            if (!!form.username && !form.passwordSsh) {
+              ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                path: ["passwordSsh"],
+                fatal: true,
+                message: t("validationMessage.required"),
+              });
+            }
+            if (form.passwordSsh !== form.passwordSshConfirm) {
+              ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                path: ["passwordSshConfirm"],
+                fatal: true,
+                message: t("validationMessage.password.notMatched"),
+              });
+            }
+            if (
+              !!form.username &&
+              form.passwordSsh
+                ?.toLowerCase()
+                .includes(form.username?.toLowerCase())
+            ) {
+              ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                path: ["passwordSsh"],
+                fatal: true,
+                message: t("validationMessage.password.containUsername"),
+              });
+            }
+            if (!!form.account && !form.passwordMysql) {
+              ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                path: ["passwordMysql"],
+                fatal: true,
+                message: t("validationMessage.required"),
+              });
+            }
+            if (!!form.passwordMysql && !form.account) {
+              ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                path: ["account"],
+                fatal: true,
+                message: t("validationMessage.required"),
+              });
+            }
+            if (form.passwordMysql !== form.passwordMysqlConfirm) {
+              ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                path: ["passwordMysqlConfirm"],
+                fatal: true,
+                message: t("validationMessage.password.notMatched"),
+              });
+            }
             if (!!form.account && !form.databaseName) {
               ctx.addIssue({
                 code: z.ZodIssueCode.custom,
@@ -123,8 +202,6 @@ export const RegisterForm = memo(
       mode: "onChange",
     });
 
-    const { account } = watch();
-
     const handleSubmitSuccess = useCallback(() => {
       router.push("/");
       showToast({ message: t("registerUserSuccess"), type: "success" });
@@ -146,14 +223,16 @@ export const RegisterForm = memo(
             data.username === checkTokenRes?.username) ||
           (!data.account && !data.databaseName && !data.username)
         ) {
-          handleSubmitSuccess();
+          router.push("/");
           return;
         }
         await registerAsync({
           data: {
             email: checkTokenRes?.email || data.email,
             username: checkTokenRes?.username || data.username,
+            passwordSsh: checkTokenRes?.passwordSsh || data.passwordSsh,
             account: checkTokenRes?.account || data.account,
+            passwordMysql: checkTokenRes?.passwordMysql || data.passwordMysql,
             databaseName: checkTokenRes?.databaseName || data.databaseName,
           },
           params: { locale: currentLocale },
@@ -163,10 +242,12 @@ export const RegisterForm = memo(
         checkTokenRes?.account,
         checkTokenRes?.databaseName,
         checkTokenRes?.email,
+        checkTokenRes?.passwordMysql,
+        checkTokenRes?.passwordSsh,
         checkTokenRes?.username,
         currentLocale,
-        handleSubmitSuccess,
         registerAsync,
+        router,
       ]
     );
 
@@ -179,48 +260,122 @@ export const RegisterForm = memo(
         onSubmit={handleSubmit(onSubmit)}
         className="flex flex-col items-start gap-40px"
       >
-        <Controller
-          control={control}
-          name="username"
-          render={({ field: { onChange, value } }) => (
-            <AppInput
-              label={t("register.inputUsername.label")}
-              labelClassName="text-lg"
-              errorText={errors.username?.message}
-              onChange={onChange}
-              value={value}
-              disabled={!!checkTokenRes?.username}
+        <div className="flex gap-40px">
+          <div className="flex flex-col items-start gap-24px">
+            <p className="font-bold text-lg text-primary-dark capitalize">
+              {t("resource.serverAccount")}
+            </p>
+            <Controller
+              control={control}
+              name="username"
+              render={({ field: { onChange, value } }) => (
+                <AppInput
+                  label={t("register.inputUsername.label")}
+                  labelClassName="text-lg"
+                  errorText={errors.username?.message}
+                  onChange={onChange}
+                  value={value}
+                  disabled={!!checkTokenRes?.username}
+                />
+              )}
             />
-          )}
-        />
-        <Controller
-          control={control}
-          name="account"
-          render={({ field: { onChange, value } }) => (
-            <AppInput
-              label={t("register.inputAccount.label")}
-              labelClassName="text-lg"
-              errorText={errors.account?.message}
-              onChange={onChange}
-              value={value}
-              disabled={!!checkTokenRes?.account}
+            <Controller
+              control={control}
+              name="passwordSsh"
+              render={({ field: { onChange, value } }) => (
+                <AppInput
+                  label={t("register.password.label")}
+                  labelClassName="text-lg"
+                  errorText={errors.passwordSsh?.message}
+                  onChange={onChange}
+                  value={value}
+                  disabled={!!checkTokenRes?.passwordSsh}
+                  type="password"
+                />
+              )}
             />
-          )}
-        />
-        <Controller
-          control={control}
-          name="databaseName"
-          render={({ field: { onChange, value } }) => (
-            <AppInput
-              label={t("register.inputDatabaseName.label")}
-              labelClassName="text-lg"
-              errorText={errors.databaseName?.message}
-              onChange={onChange}
-              value={value}
-              disabled={!!checkTokenRes?.databaseName}
+            {!checkTokenRes?.passwordSsh && (
+              <Controller
+                control={control}
+                name="passwordSshConfirm"
+                render={({ field: { onChange, value } }) => (
+                  <AppInput
+                    label={t("register.passwordConfirm.label")}
+                    labelClassName="text-lg"
+                    errorText={errors.passwordSshConfirm?.message}
+                    onChange={onChange}
+                    value={value}
+                    type="password"
+                  />
+                )}
+              />
+            )}
+          </div>
+          <div className="flex flex-col items-start gap-24px">
+            <p className="font-bold text-lg text-primary-dark capitalize">
+              {t("resource.databaseMysql")}
+            </p>
+            <Controller
+              control={control}
+              name="account"
+              render={({ field: { onChange, value } }) => (
+                <AppInput
+                  label={t("register.inputAccount.label")}
+                  labelClassName="text-lg"
+                  errorText={errors.account?.message}
+                  onChange={onChange}
+                  value={value}
+                  disabled={!!checkTokenRes?.account}
+                />
+              )}
             />
-          )}
-        />
+            <Controller
+              control={control}
+              name="passwordMysql"
+              render={({ field: { onChange, value } }) => (
+                <AppInput
+                  label={t("register.password.label")}
+                  labelClassName="text-lg"
+                  errorText={errors.passwordMysql?.message}
+                  onChange={onChange}
+                  value={value}
+                  disabled={!!checkTokenRes?.passwordMysql}
+                  type="password"
+                />
+              )}
+            />
+            {!checkTokenRes?.passwordMysql && (
+              <Controller
+                control={control}
+                name="passwordMysqlConfirm"
+                render={({ field: { onChange, value } }) => (
+                  <AppInput
+                    label={t("register.passwordConfirm.label")}
+                    labelClassName="text-lg"
+                    errorText={errors.passwordMysqlConfirm?.message}
+                    onChange={onChange}
+                    value={value}
+                    type="password"
+                  />
+                )}
+              />
+            )}
+            <Controller
+              control={control}
+              name="databaseName"
+              render={({ field: { onChange, value } }) => (
+                <AppInput
+                  label={t("register.inputDatabaseName.label")}
+                  labelClassName="text-lg"
+                  errorText={errors.databaseName?.message}
+                  onChange={onChange}
+                  value={value}
+                  disabled={!!checkTokenRes?.databaseName}
+                />
+              )}
+            />
+          </div>
+        </div>
         <AppButton
           className="self-end rounded-4 px-16px py-4px bg-primary-dark text-white"
           type="submit"

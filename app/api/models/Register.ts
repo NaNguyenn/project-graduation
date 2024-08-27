@@ -5,7 +5,9 @@ export interface RegisterType extends mongoose.Document {
   token: string;
   expiryDate: string;
   username: string;
+  passwordSsh: string;
   account: string;
+  passwordMysql: string;
   databaseName: string;
 }
 
@@ -33,10 +35,22 @@ const RegisterSchema = new mongoose.Schema<RegisterType>({
     unique: true,
     trim: true,
   },
+  passwordSsh: {
+    type: String,
+    required: false,
+    unique: false,
+    trim: true,
+  },
   account: {
     type: String,
     required: false,
     unique: true,
+    trim: true,
+  },
+  passwordMysql: {
+    type: String,
+    required: false,
+    unique: false,
     trim: true,
   },
   databaseName: {

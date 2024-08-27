@@ -1,6 +1,11 @@
 {
   "validationMessage": {
     "required": "Đây là trường bắt buộc",
+    "password": {
+      "notMatched": "Mật khẩu không khớp",
+      "invalid": "Mật khẩu cần chứa ít nhất 8 ký tự và phải bao gồm chữ cái thường, chữ cái in hoa, chữ số, ký tự đặc biệt",
+      "containUsername": "Mật khẩu không được chứa tên đăng nhập"
+    },
     "email": {
       "invalid": "Email không đúng định dạng"
     },
@@ -28,12 +33,22 @@
     "inputUsername": {
       "label": "Tên đăng nhập server"
     },
+    "password": {
+      "label": "Mật khẩu"
+    },
+    "passwordConfirm": {
+      "label": "Xác nhận mật khẩu"
+    },
     "inputAccount": {
       "label": "Tài khoản Mysql"
     },
     "inputDatabaseName": {
       "label": "Tên Cơ sở dữ liệu Mysql"
     }
+  },
+  "resource": {
+    "serverAccount": "tài khoản server linux",
+    "databaseMysql": "cơ sở dữ liệu MySQL"
   },
   "successPleaseCheckInbox": "Đăng ký thành công. Vui lòng kiểm tra hòm thư",
   "registerUserSuccess": "Đăng ký dịch vụ thành công. Bạn có thể lặp lại quá trình để kiểm tra thông tin đã đăng ký",
