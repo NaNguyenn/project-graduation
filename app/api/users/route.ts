@@ -64,7 +64,6 @@ export async function POST(req: NextRequest) {
 
       shellInstance.stdout.on("data", (data) => {
         outputMessage += data.toString();
-        console.log(data.toString());
       });
 
       shellInstance.stderr.on("data", (err) => {
@@ -74,7 +73,6 @@ export async function POST(req: NextRequest) {
       });
 
       shellInstance.on("exit", (code) => {
-        console.log(`Child process exited with code ${code}`);
         if (isShellError) {
           resolve({
             status: 500,
@@ -110,7 +108,7 @@ export async function POST(req: NextRequest) {
         { databaseName: body.databaseName },
       ],
     });
-    if (existingResource) {
+    if (existingResource && existingResource.email !== body.email) {
       return Response.json(
         { message: t("error.existingResource") },
         { status: 409 }
@@ -118,8 +116,6 @@ export async function POST(req: NextRequest) {
     }
 
     if (body.username && body.passwordSsh) {
-      console.log("🚀 ~ POST ~ body.passwordSsh:", body.passwordSsh);
-      console.log("🚀 ~ POST ~ body.username:", body.username);
       const sshResult = await runScript(
         "create-ssh.sh",
         body.username,

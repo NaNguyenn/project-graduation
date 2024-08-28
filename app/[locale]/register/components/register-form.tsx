@@ -109,7 +109,11 @@ export const RegisterForm = memo(
                 message: t("validationMessage.required"),
               });
             }
-            if (!!form.username && !form.passwordSsh) {
+            if (
+              !!form.username &&
+              !form.passwordSsh &&
+              !checkTokenRes?.username
+            ) {
               ctx.addIssue({
                 code: z.ZodIssueCode.custom,
                 path: ["passwordSsh"],
@@ -138,7 +142,11 @@ export const RegisterForm = memo(
                 message: t("validationMessage.password.containUsername"),
               });
             }
-            if (!!form.account && !form.passwordMysql) {
+            if (
+              !!form.account &&
+              !form.passwordMysql &&
+              !checkTokenRes?.account
+            ) {
               ctx.addIssue({
                 code: z.ZodIssueCode.custom,
                 path: ["passwordMysql"],
