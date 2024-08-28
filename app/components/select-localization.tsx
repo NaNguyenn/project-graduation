@@ -31,7 +31,7 @@ export const SelectLocalization = memo(() => {
 
   return (
     <select
-      className="p-8px rounded-8 fixed top-10px right-10px"
+      className="p-8px rounded-8 fixed top-10px right-10px z-10"
       onChange={handleLocalizationChange}
       defaultValue={currentLocale}
       disabled={isPending}

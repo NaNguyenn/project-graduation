@@ -58,7 +58,7 @@ export const HomeForm = memo(() => {
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="flex flex-col items-start gap-40px"
+      className="py-32px px-16px md:px-32px bg-white rounded-8 flex flex-col items-start gap-40px"
     >
       <Controller
         control={control}

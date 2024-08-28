@@ -258,9 +258,9 @@ export const RegisterForm = memo(
     return (
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="flex flex-col items-start gap-40px"
+        className="py-32px px-16px md:px-32px bg-white rounded-8 flex flex-col items-start gap-40px"
       >
-        <div className="flex gap-40px">
+        <div className="flex flex-col md:flex-row gap-40px">
           <div className="flex flex-col items-start gap-24px">
             <p className="font-bold text-lg text-primary-dark capitalize">
               {t("resource.serverAccount")}
