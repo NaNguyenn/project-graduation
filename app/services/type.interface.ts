@@ -19,5 +19,8 @@ export type CheckTokenRes = Partial<RegisterType>;
 
 export type RegisterUserReq = {
   params: { locale: string };
-  data: Partial<RegisterType>;
+  data: Partial<RegisterType> & {
+    passwordSsh?: string;
+    passwordMysql?: string;
+  };
 };

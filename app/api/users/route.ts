@@ -3,18 +3,33 @@ import { getTranslations } from "next-intl/server";
 import { NextRequest } from "next/server";
 import { z } from "zod";
 import db from "../db";
-import { regexNoSpecialCharsOrSpaces } from "@/app/utils";
+import { regexNoSpecialCharsOrSpaces, regexPassword } from "@/app/utils";
 import Register from "../models/Register";
 import { Resend } from "resend";
 import { fileURLToPath } from "url";
 import path from "path/posix";
 
-const registerUserSchema = z.object({
-  email: z.string().min(1).email(),
-  username: z.string().regex(regexNoSpecialCharsOrSpaces).optional(),
-  account: z.string().regex(regexNoSpecialCharsOrSpaces).optional(),
-  databaseName: z.string().regex(regexNoSpecialCharsOrSpaces).optional(),
-});
+const registerUserSchema = z
+  .object({
+    email: z.string().min(1).email(),
+    username: z.string().regex(regexNoSpecialCharsOrSpaces).optional(),
+    passwordSsh: z.string().regex(regexPassword).optional(),
+    account: z.string().regex(regexNoSpecialCharsOrSpaces).optional(),
+    passwordMysql: z.string().regex(regexPassword).optional(),
+    databaseName: z.string().regex(regexNoSpecialCharsOrSpaces).optional(),
+  })
+  .superRefine((form, ctx) => {
+    if (
+      !!form.username &&
+      form.passwordSsh?.toLowerCase().includes(form.username?.toLowerCase())
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["passwordSsh"],
+        fatal: true,
+      });
+    }
+  });
 
 const env = process.env.NODE_ENV;
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -102,8 +117,14 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (body.username) {
-      const sshResult = await runScript("create-ssh.sh", body.username);
+    if (body.username && body.passwordSsh) {
+      console.log("🚀 ~ POST ~ body.passwordSsh:", body.passwordSsh);
+      console.log("🚀 ~ POST ~ body.username:", body.username);
+      const sshResult = await runScript(
+        "create-ssh.sh",
+        body.username,
+        body.passwordSsh
+      );
       if (sshResult.status !== 200) {
         return Response.json(
           { message: sshResult.message },
@@ -112,10 +133,11 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    if (body.account && body.databaseName) {
+    if (body.account && body.passwordMysql && body.databaseName) {
       const mysqlResult = await runScript(
         "create-mysql.sh",
         body.account,
+        body.passwordMysql,
         body.databaseName
       );
       if (mysqlResult.status !== 200) {
@@ -157,26 +179,33 @@ export async function POST(req: NextRequest) {
       to: isSenderNotConfigured ? devEmail || "" : body.email,
       subject: `${t("email.registerUserSuccessSubject")}`,
       html: `
-        <p>
-          ${t("email.registerUserSuccess")}
-          ${
-            body.username
-              ? `${t("register.inputUsername.label")}: <b>${body.username}</b>;`
-              : ""
-          }
-          ${
-            body.account
-              ? `${t("register.inputAccount.label")}: <b>${body.account}</b>;`
-              : ""
-          }
-          ${
-            body.databaseName
-              ? `${t("register.inputDatabaseName.label")}: <b>${
-                  body.databaseName
-                }</b>;`
-              : ""
-          }
-        </p>
+        <div>
+          <p>${t("email.registerUserSuccess")}</p>
+          <p>
+            ${
+              body.passwordSsh
+                ? `${t("register.inputUsername.label")}: <b>${
+                    body.username
+                  }</b>; ${t("register.password.label")}: <b>${
+                    body.passwordSsh
+                  }</b>;`
+                : ""
+            }
+          </p>
+          <p>
+            ${
+              body.passwordMysql
+                ? `${t("register.inputAccount.label")}: <b>${
+                    body.account
+                  }</b>; ${t("register.password.label")}: <b>${
+                    body.passwordMysql
+                  }</b>; ${t("register.inputDatabaseName.label")}: <b>${
+                    body.databaseName
+                  }</b>;`
+                : ""
+            }
+          </p>
+        </div>
       `,
     });
 

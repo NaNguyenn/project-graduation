@@ -3,7 +3,9 @@ import { useToast } from "@/app/components";
 import { AppInput, AppButton } from "@/app/components/ui";
 import { useCheckTokenQuery, useRegisterUserMutation } from "@/app/services";
 import {
+  comparePassword,
   getMessage,
+  hashPassword,
   regexNoSpecialCharsOrSpaces,
   regexPassword,
 } from "@/app/utils";
@@ -230,9 +232,9 @@ export const RegisterForm = memo(
           data: {
             email: checkTokenRes?.email || data.email,
             username: checkTokenRes?.username || data.username,
-            passwordSsh: checkTokenRes?.passwordSsh || data.passwordSsh,
+            passwordSsh: data.passwordSsh,
             account: checkTokenRes?.account || data.account,
-            passwordMysql: checkTokenRes?.passwordMysql || data.passwordMysql,
+            passwordMysql: data.passwordMysql,
             databaseName: checkTokenRes?.databaseName || data.databaseName,
           },
           params: { locale: currentLocale },
@@ -242,8 +244,6 @@ export const RegisterForm = memo(
         checkTokenRes?.account,
         checkTokenRes?.databaseName,
         checkTokenRes?.email,
-        checkTokenRes?.passwordMysql,
-        checkTokenRes?.passwordSsh,
         checkTokenRes?.username,
         currentLocale,
         registerAsync,
@@ -279,36 +279,37 @@ export const RegisterForm = memo(
                 />
               )}
             />
-            <Controller
-              control={control}
-              name="passwordSsh"
-              render={({ field: { onChange, value } }) => (
-                <AppInput
-                  label={t("register.password.label")}
-                  labelClassName="text-lg"
-                  errorText={errors.passwordSsh?.message}
-                  onChange={onChange}
-                  value={value}
-                  disabled={!!checkTokenRes?.passwordSsh}
-                  type="password"
+            {!checkTokenRes?.username && (
+              <>
+                <Controller
+                  control={control}
+                  name="passwordSsh"
+                  render={({ field: { onChange, value } }) => (
+                    <AppInput
+                      label={t("register.password.label")}
+                      labelClassName="text-lg"
+                      errorText={errors.passwordSsh?.message}
+                      onChange={onChange}
+                      value={value}
+                      type="password"
+                    />
+                  )}
                 />
-              )}
-            />
-            {!checkTokenRes?.passwordSsh && (
-              <Controller
-                control={control}
-                name="passwordSshConfirm"
-                render={({ field: { onChange, value } }) => (
-                  <AppInput
-                    label={t("register.passwordConfirm.label")}
-                    labelClassName="text-lg"
-                    errorText={errors.passwordSshConfirm?.message}
-                    onChange={onChange}
-                    value={value}
-                    type="password"
-                  />
-                )}
-              />
+                <Controller
+                  control={control}
+                  name="passwordSshConfirm"
+                  render={({ field: { onChange, value } }) => (
+                    <AppInput
+                      label={t("register.passwordConfirm.label")}
+                      labelClassName="text-lg"
+                      errorText={errors.passwordSshConfirm?.message}
+                      onChange={onChange}
+                      value={value}
+                      type="password"
+                    />
+                  )}
+                />
+              </>
             )}
           </div>
           <div className="flex flex-col items-start gap-24px">
@@ -329,36 +330,37 @@ export const RegisterForm = memo(
                 />
               )}
             />
-            <Controller
-              control={control}
-              name="passwordMysql"
-              render={({ field: { onChange, value } }) => (
-                <AppInput
-                  label={t("register.password.label")}
-                  labelClassName="text-lg"
-                  errorText={errors.passwordMysql?.message}
-                  onChange={onChange}
-                  value={value}
-                  disabled={!!checkTokenRes?.passwordMysql}
-                  type="password"
+            {!checkTokenRes?.account && (
+              <>
+                <Controller
+                  control={control}
+                  name="passwordMysql"
+                  render={({ field: { onChange, value } }) => (
+                    <AppInput
+                      label={t("register.password.label")}
+                      labelClassName="text-lg"
+                      errorText={errors.passwordMysql?.message}
+                      onChange={onChange}
+                      value={value}
+                      type="password"
+                    />
+                  )}
                 />
-              )}
-            />
-            {!checkTokenRes?.passwordMysql && (
-              <Controller
-                control={control}
-                name="passwordMysqlConfirm"
-                render={({ field: { onChange, value } }) => (
-                  <AppInput
-                    label={t("register.passwordConfirm.label")}
-                    labelClassName="text-lg"
-                    errorText={errors.passwordMysqlConfirm?.message}
-                    onChange={onChange}
-                    value={value}
-                    type="password"
-                  />
-                )}
-              />
+                <Controller
+                  control={control}
+                  name="passwordMysqlConfirm"
+                  render={({ field: { onChange, value } }) => (
+                    <AppInput
+                      label={t("register.passwordConfirm.label")}
+                      labelClassName="text-lg"
+                      errorText={errors.passwordMysqlConfirm?.message}
+                      onChange={onChange}
+                      value={value}
+                      type="password"
+                    />
+                  )}
+                />
+              </>
             )}
             <Controller
               control={control}
@@ -376,13 +378,17 @@ export const RegisterForm = memo(
             />
           </div>
         </div>
-        <AppButton
-          className="self-end rounded-4 px-16px py-4px bg-primary-dark text-white"
-          type="submit"
-          disabled={loading}
-        >
-          {t("common.next")}
-        </AppButton>
+        {(!checkTokenRes?.username ||
+          !checkTokenRes?.account ||
+          !checkTokenRes?.databaseName) && (
+          <AppButton
+            className="self-end rounded-4 px-16px py-4px bg-primary-dark text-white"
+            type="submit"
+            disabled={loading}
+          >
+            {t("common.next")}
+          </AppButton>
+        )}
       </form>
     );
   }
